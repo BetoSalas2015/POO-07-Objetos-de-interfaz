@@ -3,7 +3,7 @@
  * Write a description of class Calculadora here.
  * 
  * @author Roberto Salazar Márquez
- * @version 1.0
+ * @version 1.1
  */
 
 import java.awt.*;
@@ -15,6 +15,9 @@ public class Calculadora extends Frame
     private Button b11, b12, b13, b14, b15, b16, b17;
     private TextField display;
     private Panel teclado, displ;
+    private boolean punto = true, op = true;
+    private char c = ' ';
+    private double num1 = 0.0, num2 = 0.0, res = 0.0;
 
 
     /**
@@ -29,8 +32,8 @@ public class Calculadora extends Frame
         b7 = new Button("7"); b8 = new Button("8");
         b9 = new Button("9"); b10 = new Button("0");
         b11 = new Button("+"); b12 = new Button("-");
-        b13 = new Button("="); b16 = new Button(".");
-        b15 = new Button("*"); b14 = new Button("/");
+        b13 = new Button("*"); b14 = new Button("/");
+        b15 = new Button("="); b16 = new Button(".");
         b17 = new Button("C");
         
         display = new TextField("0");
@@ -62,6 +65,74 @@ public class Calculadora extends Frame
         add(displ,"North");
         add(teclado, "Center");
         
+    }
+    
+    public boolean handleEvent(Event e)
+    {
+        if(e.id == Event.WINDOW_DESTROY) {
+            hide();
+            dispose();
+            return true;
+        }
+        return super.handleEvent(e);
+    }
+    
+    public boolean action(Event e, Object o)
+    {
+        String displaynum, sign;
+        Button btn;
+        
+        if(e.target instanceof Button) {
+            if(e.target == b17) {
+                display.setText("0");
+                punto = true;
+                op = true;
+                num1 = num2 = 0.0;
+            }
+            else 
+                if(e.target == b11 || e.target == b12 || e.target == b13 || e.target == b14) {
+                    if(op) {
+                        btn = (Button) e.target;
+                        sign = new String(btn.getLabel());
+                        c = sign.charAt(0);
+                        num1 = Double.parseDouble(display.getText());
+                        display.setText("0");
+                        op = false;
+                        punto = true;
+                    }
+                }
+                else
+                    if(e.target == b16) {
+                        if(punto) {
+                            displaynum = display.getText();
+                            displaynum = displaynum + ".";
+                            display.setText(displaynum);
+                            punto = false;
+                        }
+                    }
+                    else
+                        if(e.target == b15) {
+                            num2 = Double.parseDouble(display.getText());
+                            switch(c) {
+                                case '+': res = num1 + num2; break;
+                                case '-': res = num1 - num2; break;
+                                case '*': res = num1 * num2; break;
+                                case '/': res = num1 / num2; break;
+                            }
+                            display.setText(String.valueOf(res));
+                            op = punto = true;
+                        }
+                        else {
+                            btn = (Button) e.target;
+                            displaynum = display.getText();
+                            if(displaynum.equals("0"))
+                                displaynum = "";
+                            displaynum = displaynum + btn.getLabel();
+                            display.setText(displaynum);
+                        }
+                        
+        }
+        return true;
     }
     
     
